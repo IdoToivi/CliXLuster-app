@@ -37,4 +37,4 @@ jobs:
           push: true
           # תחליף כאן את YOUR_NAMESPACE בשם המשתמש שלך ב-DockerHub
           # ואת clixluster-frontend בשם ה-Repo שיצרת ב-DockerHub
-          tags: ido1t7/idotoivi/clixluster-frontend:latest
+          tags: ido1t7/idotoivi:latest
