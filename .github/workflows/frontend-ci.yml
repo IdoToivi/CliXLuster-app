@@ -34,7 +34,7 @@ jobs:
           context: ./CliXLuster-FE
           file: ./CliXLuster-FE/Dockerfile
           push: true
-          tags: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}
+          tags: ido1t7/clixluster-frontend:v1.${{ github.run_number }}
 
       # 5. משיכת ריפו התשתית לתוך תיקייה זמנית בשם infra-repo
       - name: Checkout Infra Repo
