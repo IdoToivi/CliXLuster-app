@@ -1,57 +1,60 @@
 name: Build and Push Frontend Image
 
-# מתי ה-CI הזה ירוץ?
 on:
   push:
     branches: [ "main" ]
-    # פילטר קריטי: ירוץ רק אם שינית משהו בתוך תיקיית הפרונטאנד!
     paths:
       - 'CliXLuster-FE/**'
-
-# חובה להוסיף הרשאת כתיבה כדי שה-Pipeline יוכל לדחוף את העדכון חזרה ל-Git
-permissions:
-  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. משיכת הקוד שלך מהמאגר לתוך שרת ה-CI
-      - name: Checkout repository
+      # 1. משיכת ריפו הקוד (הריפו שבו ה-CI רץ כרגע) לתוך תיקייה בשם app-repo
+      - name: Checkout App Repo
         uses: actions/checkout@v4
+        with:
+          path: app-repo
 
-      # 2. התחברות ל-DockerHub בעזרת הסודות שהגדרנו
+      # 2. התחברות ל-DockerHub
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3. הגדרת כלי הבנייה (עוזר לבנות אימג'ים מהר יותר)
+      # 3. בניית האימג' ודחיפה - שים לב לנתיב החדש של תיקיית app-repo
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 4. בניית האימג' ודחיפה ל-Registry עם מספר הגרסה הרץ
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./CliXLuster-FE
-          file: ./CliXLuster-FE/Dockerfile
+          context: ./app-repo/CliXLuster-FE
+          file: ./CliXLuster-app/CliXLuster-FE/Dockerfile
           push: true
-          # הוספנו את המשתנה github.run_number כחלק מהתגית
           tags: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}
 
-      # 5. עדכון קובץ ה-Deployment של קוברנטיס עם הגרסה החדשה
+      # 4. משיכת ריפו התשתית לתוך תיקייה בשם infra-repo בעזרת ה-PAT
+      - name: Checkout Infra Repo
+        uses: actions/checkout@v4
+        with:
+          repository: your-username/your-infra-repo-name # <--- חובה לשנות לשם המדויק של ריפו התשתית שלך
+          token: ${{ secrets.INFRA_REPO_PAT }}
+          path: infra-repo
+
+      # 5. עדכון ה-YAML בתוך ריפו התשתית
       - name: Update Kubernetes Manifest
         run: |
-          # מחליף את התגית הקיימת בתגית החדשה שנוצרה עכשיו
-          # *** חובה לוודא שהנתיב ./k8s/deployment.yaml נכון למבנה הפרויקט שלך ***
-          sed -i "s|image: ido1t7/clixluster-frontend:.*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./k8s/deployment.yaml
+          # אנחנו מריצים את ה-sed על הקובץ שנמצא בתוך תיקיית infra-repo
+          # ודא שהנתיב /k8s/deployment.yaml תואם למבנה בתוך ריפו התשתית שלך
+          sed -i "s|image: ido1t7/clixluster-frontend:.*|image: ido1t7/clixluster-frontend:v1.${{ github.run_number }}|g" ./CliXLuster-Infra/CliXLuster-FE/deployment.yaml
 
-      # 6. דחיפת קובץ ה-YAML המעודכן חזרה ל-Git כדי ש-ArgoCD יזהה
-      - name: Commit and Push changes
+      # 6. דחיפת העדכון חזרה לריפו התשתית
+      - name: Commit and Push changes to Infra Repo
         run: |
+          cd infra-repo
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add ./k8s/deployment.yaml
