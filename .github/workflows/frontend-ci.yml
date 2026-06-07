@@ -57,5 +57,5 @@ jobs:
           cd infra-repo
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add ./CliXLuster-FE/deployment.yaml
+          git add ./CliXLuster-FE/deployment.yml
           git diff --staged --quiet || (git commit -m "chore: update frontend image tag to v1.0.${{ github.run_number }}" && git push)
