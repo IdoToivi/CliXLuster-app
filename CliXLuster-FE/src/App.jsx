@@ -147,11 +147,16 @@ export default function App() {
               {/* Hunting status */}
               {isHunting && <HuntingStatus />}
 
-              {/* Upgraded Action button */}
+              {/* Upgraded Action button - Dynamic CI/CD Test Change */}
               <button
                 type="submit"
                 disabled={isHunting}
-                className="group relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 px-6 py-4 font-semibold text-white shadow-[0_0_15px_rgba(6,182,212,0.2)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] focus:outline-none focus:ring-2 focus:ring-cyan-400/60 disabled:cursor-not-allowed disabled:from-slate-800 disabled:via-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:shadow-none disabled:hover:scale-100"
+                className={`group relative flex w-full items-center justify-center overflow-hidden rounded-xl px-6 py-4 font-semibold text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/60 disabled:cursor-not-allowed disabled:from-slate-800 disabled:via-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:shadow-none disabled:hover:scale-100
+                  ${status === 'idle'
+                    ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] animate-pulse'
+                    : 'bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)]'
+                  }
+                `}
               >
                 {/* Subtle glass reflection overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
