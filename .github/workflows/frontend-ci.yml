@@ -4,6 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
+      # ה-CI ירוץ רק אם יהיה שינוי בתיקייה הזו:
       - 'CliXLuster-FE/**'
 
 jobs:
@@ -11,20 +12,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. משיכת ריפו הקוד (CliXLuster-app) לספריית העבודה הרגילה
       - name: Checkout App Repo
         uses: actions/checkout@v4
-        with:
-          path: CliXLuster-app
 
+      # 2. התחברות ל-DockerHub
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # 3. הכנת כלי הבנייה
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # 4. בניית האימג' ודחיפה (לוקח את הקבצים מתוך תיקיית ה-FE של האפליקציה)
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -33,24 +36,26 @@ jobs:
           push: true
           tags: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}
 
+      # 5. משיכת ריפו התשתית לתוך תיקייה זמנית בשם infra-repo
       - name: Checkout Infra Repo
         uses: actions/checkout@v4
         with:
-          repository: IdoToivi/CliXLuster-Infra # <-- ודא שזה שם המשתמש הנכון בגיטהאב
+          repository: ido1t7/CliXLuster-Infra
           token: ${{ secrets.INFRA_REPO_PAT }}
           path: infra-repo
-          ref: main # תוקן: מונע Detached HEAD
+          ref: main
 
+      # 6. עדכון הקובץ בתוך ריפו התשתית
       - name: Update Kubernetes Manifest
         run: |
-          # תוקן: Regex מדויק שלא בולע את כל השורה
-          sed -i -E "s|image: ido1t7/clixluster-frontend:[^ ]*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./CliXLuster-FE/deployment.yaml
+          # מחליף את התגית בקובץ שיושב תחת infra-repo/CliXLuster-FE
+          sed -i -E "s|image: ido1t7/clixluster-frontend:[^ ]*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./infra-repo/CliXLuster-FE/deployment.yaml
 
+      # 7. דחיפת השינוי חזרה לריפו התשתית
       - name: Commit and Push changes to Infra Repo
         run: |
           cd infra-repo
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add ./CliXLuster-FE/deployment.yaml
-          # תוקן: הגנת קריסה אם הקובץ לא השתנה באמת
           git diff --staged --quiet || (git commit -m "chore: update frontend image tag to v1.0.${{ github.run_number }}" && git push)
