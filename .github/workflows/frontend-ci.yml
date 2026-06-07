@@ -36,7 +36,7 @@ jobs:
       - name: Checkout Infra Repo
         uses: actions/checkout@v4
         with:
-          repository: ido1t7/CliXLuster-Infra # <-- ודא שזה שם המשתמש הנכון בגיטהאב
+          repository: IdoToivi/CliXLuster-Infra # <-- ודא שזה שם המשתמש הנכון בגיטהאב
           token: ${{ secrets.INFRA_REPO_PAT }}
           path: infra-repo
           ref: main # תוקן: מונע Detached HEAD
