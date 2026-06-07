@@ -28,8 +28,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./app-repo/CliXLuster-FE
-          file: ./app-repo/CliXLuster-FE/Dockerfile
+          context: ./CliXLuster-FE
+          file: ./CliXLuster-FE/Dockerfile
           push: true
           tags: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}
 
