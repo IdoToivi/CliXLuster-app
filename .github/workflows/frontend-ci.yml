@@ -40,7 +40,7 @@ jobs:
       - name: Checkout Infra Repo
         uses: actions/checkout@v4
         with:
-          repository: ido1t7/CliXLuster-Infra
+          repository: IdoToivi/CliXLuster-Infra
           token: ${{ secrets.INFRA_REPO_PAT }}
           path: infra-repo
           ref: main
