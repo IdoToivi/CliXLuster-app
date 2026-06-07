@@ -28,8 +28,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./app-repo/CliXLuster-FE
-          file: ./app-repo/CliXLuster-FE/Dockerfile
+          context: ./CliXLuster-FE
+          file: ./CliXLuster-FE/Dockerfile
           push: true
           tags: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}
 
@@ -42,7 +42,7 @@ jobs:
 
       - name: Update Kubernetes Manifest
         run: |
-          sed -i "s|image: ido1t7/clixluster-frontend:.*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./infra-repo/CliXLuster-FE/deployment.yaml
+          sed -i "s|image: ido1t7/clixluster-frontend:.*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./CliXLuster-FE/deployment.yaml
 
       - name: Commit and Push changes to Infra Repo
         run: |
