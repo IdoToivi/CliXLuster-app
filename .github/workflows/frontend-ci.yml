@@ -14,7 +14,7 @@ jobs:
       - name: Checkout App Repo
         uses: actions/checkout@v4
         with:
-          path: app-repo
+          path: CliXLuster-app
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -44,7 +44,7 @@ jobs:
       - name: Update Kubernetes Manifest
         run: |
           # תוקן: Regex מדויק שלא בולע את כל השורה
-          sed -i -E "s|image: ido1t7/clixluster-frontend:[^ ]*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./infra-repo/CliXLuster-FE/deployment.yaml
+          sed -i -E "s|image: ido1t7/clixluster-frontend:[^ ]*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./CliXLuster-FE/deployment.yaml
 
       - name: Commit and Push changes to Infra Repo
         run: |
