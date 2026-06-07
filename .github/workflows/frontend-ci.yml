@@ -28,21 +28,23 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./CliXLuster-FE
-          file: ./CliXLuster-FE/Dockerfile
+          context: ./app-repo/CliXLuster-FE
+          file: ./app-repo/CliXLuster-FE/Dockerfile
           push: true
           tags: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}
 
       - name: Checkout Infra Repo
         uses: actions/checkout@v4
         with:
-          repository: IdoToivi/CliXLuster-Infra
+          repository: ido1t7/CliXLuster-Infra # <-- ודא שזה שם המשתמש הנכון בגיטהאב
           token: ${{ secrets.INFRA_REPO_PAT }}
           path: infra-repo
+          ref: main # תוקן: מונע Detached HEAD
 
       - name: Update Kubernetes Manifest
         run: |
-          sed -i "s|image: ido1t7/clixluster-frontend:.*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./CliXLuster-FE/deployment.yaml
+          # תוקן: Regex מדויק שלא בולע את כל השורה
+          sed -i -E "s|image: ido1t7/clixluster-frontend:[^ ]*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./infra-repo/CliXLuster-FE/deployment.yaml
 
       - name: Commit and Push changes to Infra Repo
         run: |
@@ -50,5 +52,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add ./CliXLuster-FE/deployment.yaml
-          git commit -m "chore: update frontend image tag to v1.0.${{ github.run_number }}"
-          git push
+          # תוקן: הגנת קריסה אם הקובץ לא השתנה באמת
+          git diff --staged --quiet || (git commit -m "chore: update frontend image tag to v1.0.${{ github.run_number }}" && git push)
