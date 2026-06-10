@@ -49,7 +49,7 @@ jobs:
       - name: Update Kubernetes Manifest
         run: |
           # מחליף את התגית בקובץ שיושב תחת infra-repo/CliXLuster-FE
-          sed -i -E "s|image: ido1t7/clixluster-frontend:[^ ]*|image: ido1t7/clixluster-frontend:v1.0.${{ github.run_number }}|g" ./infra-repo/CliXLuster-FE/deployment.yml
+          sed -i -E "s|image: ido1t7/clixluster-frontend:[^ ]*|image: ido1t7/clixluster-frontend:v1.${{ github.run_number }}|g" ./infra-repo/CliXLuster-FE/deployment.yml
 
       # 7. דחיפת השינוי חזרה לריפו התשתית
       - name: Commit and Push changes to Infra Repo
