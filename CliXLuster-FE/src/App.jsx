@@ -90,7 +90,7 @@ export default function App() {
   const [jobId, setJobId] = useState(null)
 
   // שליחת הבקשה האמיתית ל-Backend
-  async function handleSubmit(e) {
+async function handleSubmit(e) {
     e.preventDefault()
     if (!clusterName || !email) return
 
@@ -105,6 +105,14 @@ export default function App() {
       })
       
       const data = await response.json()
+
+      // אם השרת החזיר שגיאה (כמו 422 או 500)
+      if (!response.ok) {
+        console.error("Server returned an error:", data)
+        alert(`Server Error ${response.status}: ${JSON.stringify(data)}`)
+        return
+      }
+
       setJobId(data.job_id) // שומרים את ה-ID
       
       setView('provisioning')
